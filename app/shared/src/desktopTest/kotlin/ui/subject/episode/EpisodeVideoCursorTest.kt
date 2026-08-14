@@ -52,6 +52,7 @@ import me.him188.ani.app.videoplayer.ui.NoOpVideoAspectRatio
 import me.him188.ani.app.videoplayer.ui.PlaybackSpeedControllerState
 import me.him188.ani.app.videoplayer.ui.PlayerControllerState
 import me.him188.ani.app.videoplayer.ui.VideoAspectRatioControllerState
+import me.him188.ani.app.videoplayer.ui.VideoEnhancementControllerState
 import me.him188.ani.app.videoplayer.ui.gesture.GestureFamily
 import me.him188.ani.app.videoplayer.ui.gesture.NoOpLevelController
 import me.him188.ani.app.videoplayer.ui.gesture.VIDEO_GESTURE_MOUSE_MOVE_SHOW_CONTROLLER_DURATION
@@ -132,6 +133,7 @@ class EpisodeVideoCursorTest {
                     videoAspectRatioControllerState = remember {
                         VideoAspectRatioControllerState(NoOpVideoAspectRatio, scope)
                     },
+                    videoEnhancementControllerState = null,
                     leftBottomTips = {},
                     fullscreenSwitchButton = {
                         EpisodeVideoDefaults.FloatingFullscreenSwitchButton(

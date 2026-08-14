@@ -733,6 +733,11 @@
     <string name="video_player_aspect_fit">适应</string>
     <string name="video_player_aspect_stretch">填充</string>
     <string name="video_player_aspect_crop">裁切</string>
+    <string name="video_player_video_enhancement_off">关闭</string>
+    <string name="video_player_video_enhancement_ru_s">Anime4K 低</string>
+    <string name="video_player_video_enhancement_ru_m">Anime4K 中</string>
+    <string name="video_player_video_enhancement_ru_l">Anime4K 高</string>
+    <string name="video_player_video_enhancement_ru_vl">Anime4K 极高</string>
     <string name="video_player_auto">自动</string>
     <string name="video_player_audio_track">音轨</string>
     <string name="video_player_off">关闭</string>

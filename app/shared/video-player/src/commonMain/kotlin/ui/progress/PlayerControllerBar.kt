@@ -108,8 +108,10 @@ import me.him188.ani.app.ui.foundation.theme.stronglyWeaken
 import me.him188.ani.app.videoplayer.ui.PlaybackSpeedControllerState
 import me.him188.ani.app.videoplayer.ui.PlayerControllerState
 import me.him188.ani.app.videoplayer.ui.VideoAspectRatioControllerState
+import me.him188.ani.app.videoplayer.ui.VideoEnhancementControllerState
 import me.him188.ani.app.videoplayer.ui.keepLayoutWhenHidden
 import me.him188.ani.app.videoplayer.ui.renderAspectRatioMode
+import me.him188.ani.app.videoplayer.ui.renderVideoEnhancementMode
 import me.him188.ani.app.videoplayer.ui.top.needWorkaroundForFocusManager
 import me.him188.ani.app.utils.formatSpeedValue
 import kotlin.math.roundToInt
@@ -123,6 +125,8 @@ const val TAG_SPEED_SWITCHER_VALUE_INDICATOR = "SpeedSwitcherValueIndicator"
 const val TAG_DANMAKU_ICON_BUTTON = "DanmakuIconButton"
 const val TAG_VIDEO_ASPECT_RATIO_SELECTOR_TEXT_BUTTON = "VideoAspectRatioTextButton"
 const val TAG_VIDEO_ASPECT_RATIO_SELECTOR_DROPDOWN_MENU = "VideoAspectRatioDropdownMenu"
+const val TAG_VIDEO_ENHANCEMENT_SELECTOR_TEXT_BUTTON = "VideoEnhancementTextButton"
+const val TAG_VIDEO_ENHANCEMENT_SELECTOR_DROPDOWN_MENU = "VideoEnhancementDropdownMenu"
 
 @Stable
 object PlayerControllerDefaults {
@@ -634,6 +638,32 @@ object PlayerControllerDefaults {
             ),
             textButtonTestTag = TAG_VIDEO_ASPECT_RATIO_SELECTOR_TEXT_BUTTON,
             dropdownMenuTestTag = TAG_VIDEO_ASPECT_RATIO_SELECTOR_DROPDOWN_MENU,
+            onExpandedChanged = onExpandedChanged,
+        )
+    }
+
+    /**
+     * Video enhancement (Anime4K super-resolution) selector
+     */
+
+    @Composable
+    fun VideoEnhancementSelector(
+        videoEnhancementControllerState: VideoEnhancementControllerState,
+        modifier: Modifier = Modifier,
+        onExpandedChanged: (expanded: Boolean) -> Unit = {},
+    ) {
+        return OptionsSwitcher(
+            value = videoEnhancementControllerState.currentMode,
+            onValueChange = { videoEnhancementControllerState.setMode(it) },
+            optionsProvider = { VideoEnhancementControllerState.Entries },
+            renderValue = { Text(renderVideoEnhancementMode(it)) },
+            renderValueExposed = { Text(renderVideoEnhancementMode(it)) },
+            modifier,
+            properties = PlatformPopupProperties(
+                clippingEnabled = false,
+            ),
+            textButtonTestTag = TAG_VIDEO_ENHANCEMENT_SELECTOR_TEXT_BUTTON,
+            dropdownMenuTestTag = TAG_VIDEO_ENHANCEMENT_SELECTOR_DROPDOWN_MENU,
             onExpandedChanged = onExpandedChanged,
         )
     }

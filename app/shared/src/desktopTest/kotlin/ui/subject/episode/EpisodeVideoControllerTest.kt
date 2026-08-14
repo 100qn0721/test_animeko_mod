@@ -86,7 +86,9 @@ import me.him188.ani.app.videoplayer.ui.NoOpVideoAspectRatio
 import me.him188.ani.app.videoplayer.ui.PlaybackSpeedControllerState
 import me.him188.ani.app.videoplayer.ui.PlayerControllerState
 import me.him188.ani.app.videoplayer.ui.VideoAspectRatioControllerState
+import me.him188.ani.app.videoplayer.ui.VideoEnhancementControllerState
 import me.him188.ani.app.ui.foundation.input.LocalActiveInputSource
+import me.him188.ani.app.ui.lang.*
 import me.him188.ani.app.videoplayer.ui.gesture.GestureFamily
 import me.him188.ani.app.videoplayer.ui.gesture.gestureFamilyOf
 import me.him188.ani.app.videoplayer.ui.gesture.mouseFamily
@@ -107,14 +109,19 @@ import me.him188.ani.app.videoplayer.ui.progress.TAG_SELECT_EPISODE_ICON_BUTTON
 import me.him188.ani.app.videoplayer.ui.progress.TAG_SPEED_SWITCHER_DROPDOWN_MENU
 import me.him188.ani.app.videoplayer.ui.progress.TAG_SPEED_SWITCHER_SLIDER
 import me.him188.ani.app.videoplayer.ui.progress.TAG_SPEED_SWITCHER_TEXT_BUTTON
+import me.him188.ani.app.videoplayer.ui.progress.TAG_VIDEO_ENHANCEMENT_SELECTOR_DROPDOWN_MENU
+import me.him188.ani.app.videoplayer.ui.progress.TAG_VIDEO_ENHANCEMENT_SELECTOR_TEXT_BUTTON
 import me.him188.ani.app.videoplayer.ui.top.PlayerTopBar
 import me.him188.ani.danmaku.ui.DanmakuConfig
 import me.him188.ani.utils.platform.Arch
 import me.him188.ani.utils.platform.Platform
 import org.junit.jupiter.api.Disabled
+import org.jetbrains.compose.resources.stringResource
 import org.openani.mediamp.InternalForInheritanceMediampApi
 import org.openani.mediamp.MediaStatus
 import org.openani.mediamp.features.PlaybackSpeed
+import org.openani.mediamp.features.VideoEnhancement
+import org.openani.mediamp.features.VideoEnhancementMode
 import org.openani.mediamp.source.UriMediaData
 import org.openani.mediamp.test.TestMediampPlayer
 import kotlin.test.Test
@@ -221,6 +228,9 @@ class EpisodeVideoControllerTest {
         audioController: LevelController = NoOpLevelController,
         playbackSpeed: PlaybackSpeed = NoOpPlaybackSpeedController,
         onCommitPlaybackSpeed: (Float) -> Unit = {},
+        // null (default) hides the enhancement selector, keeping the controller layout
+        // identical for tests that do not exercise it.
+        videoEnhancement: VideoEnhancement? = null,
         opEdSkipDuration: Duration = 85.seconds,
         watchTogetherPlayerController: WatchTogetherPlayerController? = null,
         onPlayerStateCreated: (TestMediampPlayer) -> Unit = {},
@@ -312,6 +322,9 @@ class EpisodeVideoControllerTest {
                 },
                 videoAspectRatioControllerState = remember {
                     VideoAspectRatioControllerState(NoOpVideoAspectRatio, scope)
+                },
+                videoEnhancementControllerState = remember(videoEnhancement) {
+                    videoEnhancement?.let { VideoEnhancementControllerState(it, scope) }
                 },
                 leftBottomTips = {},
                 fullscreenSwitchButton = {
@@ -2091,6 +2104,40 @@ class EpisodeVideoControllerTest {
             },
         )
     }
+
+    @Test
+    fun `touch - video enhancement selector - pick a preset dispatches setMode`() = runAniComposeUiTest {
+        lateinit var videoEnhancement: TestVideoEnhancement
+        var ruMText = ""
+        setContent {
+            videoEnhancement = remember { TestVideoEnhancement() }
+            // 按钮与菜单项的文案都来自资源, 按当前 locale 解析后的文本定位菜单项.
+            ruMText = stringResource(Lang.video_player_video_enhancement_ru_m)
+            Player(
+                GestureFamily.TOUCH,
+                videoEnhancement = videoEnhancement,
+            )
+        }
+        onRoot().performTouchInput { click() }
+        runOnIdle {
+            waitUntil(timeoutMillis = WAIT_TIMEOUT) {
+                onNodeWithTag(TAG_VIDEO_ENHANCEMENT_SELECTOR_TEXT_BUTTON).exists()
+            }
+        }
+        onNodeWithTag(TAG_VIDEO_ENHANCEMENT_SELECTOR_TEXT_BUTTON).performClick()
+        runOnIdle {
+            waitUntil(timeoutMillis = WAIT_TIMEOUT) {
+                onNodeWithTag(TAG_VIDEO_ENHANCEMENT_SELECTOR_DROPDOWN_MENU).exists()
+            }
+        }
+        onNodeWithText(ruMText).performClick()
+        runOnIdle {
+            assertEquals(
+                listOf(VideoEnhancementMode.ANIME4K_RU_M),
+                videoEnhancement.setModeCalls,
+            )
+        }
+    }
     ///////////////////////////////////////////////////////////////////////////
     // mouse
     ///////////////////////////////////////////////////////////////////////////
@@ -2426,5 +2473,16 @@ class EpisodeVideoControllerTest {
                 controllerState.visibility,
             )
         }
+    }
+}
+
+@OptIn(InternalForInheritanceMediampApi::class)
+private class TestVideoEnhancement : VideoEnhancement {
+    override val mode = MutableStateFlow(VideoEnhancementMode.OFF)
+    val setModeCalls = mutableListOf<VideoEnhancementMode>()
+
+    override fun setMode(mode: VideoEnhancementMode) {
+        setModeCalls.add(mode)
+        this.mode.value = mode
     }
 }

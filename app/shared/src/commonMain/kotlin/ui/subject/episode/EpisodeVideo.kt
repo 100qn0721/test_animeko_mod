@@ -125,6 +125,7 @@ import me.him188.ani.app.videoplayer.ui.PlaybackSpeedControllerState
 import me.him188.ani.app.videoplayer.ui.PlayerControllerState
 import me.him188.ani.app.videoplayer.ui.PlayerStatsOverlay
 import me.him188.ani.app.videoplayer.ui.VideoAspectRatioControllerState
+import me.him188.ani.app.videoplayer.ui.VideoEnhancementControllerState
 import me.him188.ani.app.videoplayer.ui.VideoPlayer
 import me.him188.ani.app.videoplayer.ui.VideoScaffold
 import me.him188.ani.app.videoplayer.ui.VideoSideSheetsController
@@ -150,6 +151,7 @@ import me.him188.ani.app.videoplayer.ui.progress.PlayerControllerBar
 import me.him188.ani.app.videoplayer.ui.progress.PlayerControllerDefaults
 import me.him188.ani.app.videoplayer.ui.progress.PlayerControllerDefaults.SpeedSwitcher
 import me.him188.ani.app.videoplayer.ui.progress.PlayerControllerDefaults.VideoAspectRatioSelector
+import me.him188.ani.app.videoplayer.ui.progress.PlayerControllerDefaults.VideoEnhancementSelector
 import me.him188.ani.app.videoplayer.ui.progress.PlayerProgressSliderState
 import me.him188.ani.app.videoplayer.ui.progress.ProgressSliderCenteredPreviewFrame
 import me.him188.ani.app.videoplayer.ui.progress.SubtitleSwitcher
@@ -220,6 +222,7 @@ internal fun EpisodeVideoImpl(
     brightnessController: LevelController,
     playbackSpeedControllerState: PlaybackSpeedControllerState?,
     videoAspectRatioControllerState: VideoAspectRatioControllerState?,
+    videoEnhancementControllerState: VideoEnhancementControllerState?,
     leftBottomTips: @Composable () -> Unit,
     fullscreenSwitchButton: @Composable () -> Unit,
     sideSheets: @Composable (controller: VideoSideSheetsController<EpisodeVideoSideSheetPage>) -> Unit,
@@ -541,6 +544,18 @@ internal fun EpisodeVideoImpl(
                                         videoAspectRatioAlwaysOnRequester.request()
                                     } else {
                                         videoAspectRatioAlwaysOnRequester.cancelRequest()
+                                    }
+                                }
+                            }
+
+                            val videoEnhancementAlwaysOnRequester =
+                                rememberAlwaysOnRequester(playerControllerState, "videoEnhancementSelector")
+                            videoEnhancementControllerState?.also { controller ->
+                                VideoEnhancementSelector(controller) {
+                                    if (it) {
+                                        videoEnhancementAlwaysOnRequester.request()
+                                    } else {
+                                        videoEnhancementAlwaysOnRequester.cancelRequest()
                                     }
                                 }
                             }
@@ -880,6 +895,7 @@ private fun PreviewVideoScaffoldImpl(
         videoAspectRatioControllerState = remember {
             VideoAspectRatioControllerState(NoOpVideoAspectRatio, scope)
         },
+        videoEnhancementControllerState = null,
         leftBottomTips = {
             PlayerControllerDefaults.LeftBottomTips(
                 onClick = {},
