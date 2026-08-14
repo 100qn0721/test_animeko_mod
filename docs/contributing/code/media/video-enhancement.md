@@ -17,6 +17,8 @@
 ```
 EpisodePage (app/shared, commonMain)
   ├─ vm.player.features[VideoEnhancement]          ← 仅 mpv 后端存在; 其他后端为 null → UI 不显示
+  ├─ vm.videoEnhancementSettings.mode              ← 持久化设置 (VideoEnhancementSettings, DataStore)
+  │    恢复: controller 创建时应用; 保存: onModeChanged → vm.setVideoEnhancementMode
   ▼
 VideoEnhancementControllerState (app/shared/video-player, commonMain)
   ├─ 当前预设的 UI 状态; 仿 VideoAspectRatioControllerState
@@ -54,7 +56,9 @@ UR（先放大后还原）与 Soft 变体也已打包进资源，但第一版 UI
   不是 bug。
 - 开启后 GPU 负载上升，4K 输出下低端显卡可能掉帧；S 档与关闭是兜底。
 - 切换在下一帧渲染时生效，无需重载媒体。
-- 该功能不持久化（会话级），应用重启后回到"关闭"。
+- **选择会被记住**：用户选择的预设持久化到 `VideoEnhancementSettings`
+  （`SettingsRepository`，DataStore 序列化），下次打开播放页自动恢复并应用；
+  默认仍为"关闭"。后端拒绝某预设时（着色器缺失）保持关闭且不写回。
 - Android/iOS 不提供此功能（ExoPlayer/VLC 后端无 shader 管线）。
 
 ## 验证

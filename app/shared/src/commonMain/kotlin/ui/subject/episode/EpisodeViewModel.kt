@@ -53,6 +53,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.him188.ani.app.data.models.episode.displayName
 import me.him188.ani.app.data.models.episode.renderEpisodeEp
+import me.him188.ani.app.data.models.preference.VideoEnhancementSettings
 import me.him188.ani.app.data.models.preference.VideoScaffoldConfig
 import me.him188.ani.app.data.models.subject.SubjectInfo
 import me.him188.ani.app.data.models.subject.SubjectProgressInfo
@@ -187,6 +188,7 @@ import org.koin.core.component.inject
 import org.openani.mediamp.InternalMediampApi
 import org.openani.mediamp.MediampPlayer
 import org.openani.mediamp.MediampPlayerFactory
+import org.openani.mediamp.features.VideoEnhancementMode
 import org.openani.mediamp.features.chapters
 import org.openani.mediamp.metadata.Chapter
 import kotlin.time.Duration.Companion.milliseconds
@@ -402,6 +404,18 @@ class EpisodeViewModel(
 
     val videoScaffoldConfig: VideoScaffoldConfig by settingsRepository.videoScaffoldConfig
         .flow.produceState(VideoScaffoldConfig.Default)
+
+    /** 上次使用的视频增强预设 (Anime4K 超分); 仅桌面端 mpv 后端有效. */
+    val videoEnhancementSettings: VideoEnhancementSettings by settingsRepository.videoEnhancementSettings
+        .flow.produceState(VideoEnhancementSettings.Default)
+
+    fun setVideoEnhancementMode(mode: VideoEnhancementMode) {
+        launchInBackground {
+            settingsRepository.videoEnhancementSettings.update {
+                copy(mode = mode)
+            }
+        }
+    }
 
     /** 当前生效的用户倍速范围. */
     val playbackSpeedRange: ClosedFloatingPointRange<Float>

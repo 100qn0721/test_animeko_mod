@@ -37,6 +37,7 @@ import me.him188.ani.app.data.models.preference.ThemeSettings
 import me.him188.ani.app.data.models.preference.TorrentPeerConfig
 import me.him188.ani.app.data.models.preference.UISettings
 import me.him188.ani.app.data.models.preference.UpdateSettings
+import me.him188.ani.app.data.models.preference.VideoEnhancementSettings
 import me.him188.ani.app.data.models.preference.VideoResolverSettings
 import me.him188.ani.app.data.models.preference.VideoScaffoldConfig
 import me.him188.ani.app.data.models.preference.WatchTogetherSettings
@@ -74,6 +75,7 @@ interface SettingsRepository {
     val themeSettings: Settings<ThemeSettings>
     val updateSettings: Settings<UpdateSettings>
     val videoScaffoldConfig: Settings<VideoScaffoldConfig>
+    val videoEnhancementSettings: Settings<VideoEnhancementSettings>
 
     val videoResolverSettings: Settings<VideoResolverSettings>
     val anitorrentConfig: Settings<AnitorrentConfig>
@@ -216,6 +218,11 @@ class PreferencesRepositoryImpl(
         "videoScaffoldConfig",
         VideoScaffoldConfig.serializer(),
         default = { VideoScaffoldConfig.Default },
+    )
+    override val videoEnhancementSettings: Settings<VideoEnhancementSettings> = SerializablePreference(
+        "videoEnhancementSettings",
+        VideoEnhancementSettings.serializer(),
+        default = { VideoEnhancementSettings.Default },
     )
     override val videoResolverSettings: Settings<VideoResolverSettings> = SerializablePreference(
         "videoResolverSettings",

@@ -29,11 +29,23 @@ import org.jetbrains.compose.resources.*
 class VideoEnhancementControllerState(
     private val videoEnhancement: VideoEnhancement,
     scope: CoroutineScope,
+    /**
+     * 创建时立即应用的预设 (持久化设置恢复). 为 [VideoEnhancementMode.OFF] 时不调用后端,
+     * 保持"默认不触碰渲染管线"的语义. 后端拒绝该预设时 (着色器不可用) 当前状态保持 OFF.
+     */
+    initialMode: VideoEnhancementMode = VideoEnhancementMode.OFF,
+    /**
+     * 用户通过本控制器切换预设时回调 (持久化用); 恢复初始值不触发.
+     */
+    private val onModeChanged: ((VideoEnhancementMode) -> Unit)? = null,
 ) {
     var currentMode by mutableStateOf(videoEnhancement.mode.value)
     val currentIndex by derivedStateOf { Entries.indexOf(currentMode) }
 
     init {
+        if (initialMode != VideoEnhancementMode.OFF) {
+            videoEnhancement.setMode(initialMode)
+        }
         scope.launch {
             videoEnhancement.mode.collect {
                 currentMode = it
@@ -43,6 +55,7 @@ class VideoEnhancementControllerState(
 
     fun setMode(mode: VideoEnhancementMode) {
         videoEnhancement.setMode(mode)
+        onModeChanged?.invoke(mode)
     }
 
     companion object {

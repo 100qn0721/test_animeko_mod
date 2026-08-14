@@ -1064,7 +1064,14 @@ private fun EpisodeVideo(
             vm.player.features[VideoAspectRatio]?.let { VideoAspectRatioControllerState(it, scope = scope) }
         },
         videoEnhancementControllerState = remember {
-            vm.player.features[VideoEnhancement]?.let { VideoEnhancementControllerState(it, scope = scope) }
+            vm.player.features[VideoEnhancement]?.let {
+                VideoEnhancementControllerState(
+                    it,
+                    scope = scope,
+                    initialMode = vm.videoEnhancementSettings.mode,
+                    onModeChanged = { mode -> vm.setVideoEnhancementMode(mode) },
+                )
+            }
         },
         leftBottomTips = {
             AniAnimatedVisibility(
